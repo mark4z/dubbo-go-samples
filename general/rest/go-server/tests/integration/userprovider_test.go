@@ -28,7 +28,7 @@ import (
 )
 
 func TestGetUserA000(t *testing.T) {
-	user := &JsonRPCUser{}
+	user := &User{}
 	err := userProvider.GetUser(context.TODO(), []interface{}{"A000"}, user)
 	assert.Nil(t, err)
 	assert.Equal(t, "0", user.ID)
@@ -39,7 +39,7 @@ func TestGetUserA000(t *testing.T) {
 }
 
 func TestGetUserA001(t *testing.T) {
-	user := &JsonRPCUser{}
+	user := &User{}
 	err := userProvider.GetUser(context.TODO(), []interface{}{"A001"}, user)
 	assert.Nil(t, err)
 	assert.Equal(t, "001", user.ID)
@@ -50,7 +50,7 @@ func TestGetUserA001(t *testing.T) {
 }
 
 func TestGetUserA002(t *testing.T) {
-	user := &JsonRPCUser{}
+	user := &User{}
 	err := userProvider.GetUser(context.TODO(), []interface{}{"A002"}, user)
 	assert.Nil(t, err)
 	assert.Equal(t, "002", user.ID)
@@ -61,30 +61,23 @@ func TestGetUserA002(t *testing.T) {
 }
 
 func TestGetUserA003(t *testing.T) {
-	user := &JsonRPCUser{}
+	user := &User{}
 	err := userProvider.GetUser(context.TODO(), []interface{}{"A003"}, user)
 	assert.Nil(t, err)
 	assert.Equal(t, "113", user.ID)
-	assert.Equal(t, "Moorse", user.Name)
+	assert.Equal(t, "Moorse中文", user.Name)
 	assert.Equal(t, int64(30), user.Age)
-	assert.Equal(t, "WOMAN", user.Sex)
+	assert.Equal(t, "MAN", user.Sex)
 	assert.NotNil(t, user.Time)
 }
 
 func TestGetUser0(t *testing.T) {
-	user, err := userProvider.GetUser0("A003", "Moorse")
+	user, err := userProvider.GetUser0("A001", "ZhangSheng", 18)
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
 
-	user, err = userProvider.GetUser0("A003", "MOORSE")
+	user, err = userProvider.GetUser0("A005", "Lily", 20)
 	assert.NotNil(t, err)
-}
-
-func TestGetUser2(t *testing.T) {
-	user := &JsonRPCUser{}
-	err := userProvider.GetUser2(context.TODO(), []interface{}{int32(64)}, user)
-	assert.Nil(t, err)
-	assert.Equal(t, "64", user.ID)
 }
 
 func TestGetUser3(t *testing.T) {
@@ -93,8 +86,7 @@ func TestGetUser3(t *testing.T) {
 }
 
 func TestGetUsers(t *testing.T) {
-	users, err := userProvider.GetUsers([]interface{}{[]interface{}{"A002", "A003"}})
+	users, err := userProvider.GetUsers([]interface{}{map[string]string{"ID": "A002"}})
 	assert.Nil(t, err)
 	assert.Equal(t, "Lily", users[0].Name)
-	assert.Equal(t, "Moorse", users[1].Name)
 }
