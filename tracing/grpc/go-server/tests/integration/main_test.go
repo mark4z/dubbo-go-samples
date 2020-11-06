@@ -1,3 +1,5 @@
+// +build integration
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,46 +17,48 @@
  * limitations under the License.
  */
 
-package main
+package integration
 
 import (
 	"context"
-	"os"
-	"time"
-)
+	"github.com/apache/dubbo-samples/golang/tracing/grpc/protobuf"
+	"google.golang.org/grpc"
 
-import (
-	hessian "github.com/apache/dubbo-go-hessian2"
-	"github.com/apache/dubbo-samples/golang/tracing/dubbo/go-client/pkg"
-	"github.com/dubbogo/gost/log"
-)
-
-import (
 	_ "github.com/apache/dubbo-go/cluster/cluster_impl"
 	_ "github.com/apache/dubbo-go/cluster/loadbalance"
 	_ "github.com/apache/dubbo-go/common/proxy/proxy_factory"
 	"github.com/apache/dubbo-go/config"
 	_ "github.com/apache/dubbo-go/filter/filter_impl"
 	_ "github.com/apache/dubbo-go/protocol/dubbo"
+	_ "github.com/apache/dubbo-go/protocol/grpc"
 	_ "github.com/apache/dubbo-go/registry/protocol"
 	_ "github.com/apache/dubbo-go/registry/zookeeper"
 )
 
-// need to setup environment variable "CONF_CONSUMER_FILE_PATH" to "conf/client.yml" before run
-func main() {
-	userProvider := new(pkg.UserProvider)
-	hessian.RegisterPOJO(&pkg.User{})
-	config.SetConsumerService(userProvider)
+import (
+	"os"
+	"testing"
+	"time"
+)
+
+var grpcGreeterImpl = new(GrpcGreeterImpl)
+
+func TestMain(m *testing.M) {
+	config.SetConsumerService(grpcGreeterImpl)
 	config.Load()
 	time.Sleep(3 * time.Second)
 
-	gxlog.CInfo("\n\n\nstart to test dubbo")
-	user := &pkg.User{}
-	err := userProvider.GetUser(context.TODO(), []interface{}{"A001"}, user)
-	if err != nil {
-		gxlog.CError("error: %v\n", err)
-		os.Exit(1)
-		return
-	}
-	gxlog.CInfo("response result: %v\n", user)
+	os.Exit(m.Run())
+}
+
+type GrpcGreeterImpl struct {
+	SayHello func(ctx context.Context, in *protobuf.HelloRequest, out *protobuf.HelloReply) error
+}
+
+func (u *GrpcGreeterImpl) Reference() string {
+	return "GrpcGreeterImpl"
+}
+
+func (u *GrpcGreeterImpl) GetDubboStub(cc *grpc.ClientConn) protobuf.GreeterClient {
+	return protobuf.NewGreeterClient(cc)
 }
