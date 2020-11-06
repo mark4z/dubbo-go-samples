@@ -1,6 +1,5 @@
 # dubbo client yaml configure file
 
-
 check: true
 # client
 request_timeout: "3s"
@@ -9,13 +8,13 @@ connect_timeout: "3s"
 
 # application config
 application:
-  organization: "ikurento.com"
-  name: "BDTService"
-  module: "dubbogo user-info client"
+  organization: "dubbo.io"
+  name: "ProductProviderClient"
+  module: "dubbo-go product provider client"
   version: "0.0.1"
-  owner: "ZX"
   environment: "dev"
 
+# registry config
 registries:
   "demoZk":
     protocol: "zookeeper"
@@ -24,19 +23,23 @@ registries:
     username: ""
     password: ""
 
+# reference config
 references:
-  "OrderProvider":
+  "ProductProvider":
     group: dg
     version: 1.0.0
-    # 可以指定多个registry，使用逗号隔开;不指定默认向所有注册中心注册
     registry: "demoZk"
     protocol: "dubbo"
-    interface: "com.ikurento.order.OrderProvider"
+    interface: "org.apache.dubbo.ProductProvider"
+    loadbalance: "random"
+    warmup: "100"
     cluster: "failover"
     methods:
-      - name: "GetOrder"
+      - name: "GetProduct"
         retries: 3
+        loadbalance: "random"
 
+# protocol config
 protocol_conf:
   dubbo:
     reconnect_interval: 0

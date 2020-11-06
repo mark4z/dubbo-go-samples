@@ -1,3 +1,5 @@
+// +build integration
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,8 +17,25 @@
  * limitations under the License.
  */
 
-package main
+package integration
 
-var (
-	Version = "2.7.7"
+import (
+	"context"
+	"github.com/apache/dubbo-samples/golang/shop/go-service-user/pkg"
+	"testing"
 )
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGetUser(t *testing.T) {
+	order := &pkg.Order{}
+	err := orderProvider.GetOrder(context.TODO(), []interface{}{"A001"}, order)
+	assert.Nil(t, err)
+	assert.Equal(t, "A001", order.Name)
+	assert.Equal(t, "A001", order.Id)
+	assert.Equal(t, 200, order.Price)
+	assert.Equal(t, "A001", order.Product.Id)
+	assert.Equal(t, 100, order.Product.Quantity)
+	assert.Equal(t, 100, order.Product.Price)
+}

@@ -1,3 +1,5 @@
+// +build integration
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,53 +17,36 @@
  * limitations under the License.
  */
 
-package main
-
-import (
-	"context"
-	"fmt"
-)
-
-import (
-	"github.com/apache/dubbo-go/config"
-)
+package integration
 
 import (
 	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/apache/dubbo-go/config"
+	"github.com/apache/dubbo-samples/golang/shop/go-service-user/pkg"
+
+	_ "github.com/apache/dubbo-go/cluster/cluster_impl"
+	_ "github.com/apache/dubbo-go/cluster/loadbalance"
+	_ "github.com/apache/dubbo-go/common/proxy/proxy_factory"
+	_ "github.com/apache/dubbo-go/filter/filter_impl"
+	_ "github.com/apache/dubbo-go/protocol/dubbo"
+	_ "github.com/apache/dubbo-go/registry/protocol"
+	_ "github.com/apache/dubbo-go/registry/zookeeper"
 )
 
-var (
-	productProvider = new(ProductProvider)
+import (
+	"os"
+	"testing"
+	"time"
 )
 
-func init() {
-	config.SetProviderService(productProvider)
-	hessian.RegisterPOJO(&Product{})
-}
+var orderProvider = new(pkg.OrderProvider)
 
-type Product struct {
-	Id       string
-	Price    int
-	Quantity int
-}
+func TestMain(m *testing.M) {
+	config.SetConsumerService(orderProvider)
+	hessian.RegisterPOJO(&pkg.Order{})
+	hessian.RegisterPOJO(&pkg.Product{})
+	config.Load()
+	time.Sleep(3 * time.Second)
 
-func (Product) JavaClassName() string {
-	return "com.ikurento.product.Product"
-}
-
-type ProductProvider struct{}
-
-func (p *ProductProvider) GetProduct(ctx context.Context, req []interface{}) (*Product, error) {
-	println("req:%#v", req)
-	rsp := Product{"A001", 100, 100}
-	println("rsp:%#v", rsp)
-	return &rsp, nil
-}
-
-func (p *ProductProvider) Reference() string {
-	return "ProductProvider"
-}
-
-func println(format string, args ...interface{}) {
-	fmt.Printf("\033[32;40m"+format+"\033[0m\n", args...)
+	os.Exit(m.Run())
 }

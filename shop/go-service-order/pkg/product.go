@@ -15,8 +15,38 @@
  * limitations under the License.
  */
 
-package main
+package pkg
+
+import (
+	"context"
+	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/apache/dubbo-go/config"
+)
 
 var (
-	Version = "2.7.7"
+	productProvider = new(ProductProvider)
 )
+
+func init() {
+	config.SetConsumerService(productProvider)
+	// ------for hessian2------
+	hessian.RegisterPOJO(&Product{})
+}
+
+type Product struct {
+	Id       string
+	Price    int
+	Quantity int
+}
+
+func (Product) JavaClassName() string {
+	return "org.apache.dubbo.Product"
+}
+
+type ProductProvider struct {
+	GetProduct func(ctx context.Context, req []interface{}, rsp *Product) error
+}
+
+func (u *ProductProvider) Reference() string {
+	return "ProductProvider"
+}

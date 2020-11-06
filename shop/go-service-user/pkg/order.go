@@ -15,14 +15,37 @@
  * limitations under the License.
  */
 
-package main
+package pkg
 
-import "fmt"
-
-var (
-	Version = "2.7.7"
+import (
+	"context"
 )
 
-func println(format string, args ...interface{}) {
-	fmt.Printf("\033[32;40m"+format+"\033[0m\n", args...)
+type Order struct {
+	Id      string
+	Name    string
+	Price   int
+	Product Product
+}
+
+func (u Order) JavaClassName() string {
+	return "org.apache.dubbo.Order"
+}
+
+type Product struct {
+	Id       string
+	Price    int
+	Quantity int
+}
+
+func (p Product) JavaClassName() string {
+	return "org.apache.dubbo.Product"
+}
+
+type OrderProvider struct {
+	GetOrder func(ctx context.Context, req []interface{}, rsp *Order) error
+}
+
+func (u *OrderProvider) Reference() string {
+	return "OrderProvider"
 }

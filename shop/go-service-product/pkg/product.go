@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package main
+package pkg
 
 import (
 	"context"
+	"fmt"
 )
 
 import (
@@ -34,8 +35,7 @@ var (
 )
 
 func init() {
-	config.SetConsumerService(productProvider)
-	// ------for hessian2------
+	config.SetProviderService(productProvider)
 	hessian.RegisterPOJO(&Product{})
 }
 
@@ -46,13 +46,22 @@ type Product struct {
 }
 
 func (Product) JavaClassName() string {
-	return "com.ikurento.product.Product"
+	return "org.apache.dubbo.Product"
 }
 
-type ProductProvider struct {
-	GetProduct func(ctx context.Context, req []interface{}, rsp *Product) error
+type ProductProvider struct{}
+
+func (p *ProductProvider) GetProduct(ctx context.Context, req []interface{}) (*Product, error) {
+	println("req:%#v", req)
+	rsp := Product{"A001", 100, 100}
+	println("rsp:%#v", rsp)
+	return &rsp, nil
 }
 
-func (u *ProductProvider) Reference() string {
+func (p *ProductProvider) Reference() string {
 	return "ProductProvider"
+}
+
+func println(format string, args ...interface{}) {
+	fmt.Printf("\033[32;40m"+format+"\033[0m\n", args...)
 }

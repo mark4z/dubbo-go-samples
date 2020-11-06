@@ -15,18 +15,12 @@
  * limitations under the License.
  */
 
-package main
+package pkg
 
 import (
 	"context"
-)
-
-import (
-	"github.com/apache/dubbo-go/config"
-)
-
-import (
 	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/apache/dubbo-go/config"
 )
 
 var (
@@ -47,7 +41,7 @@ type Order struct {
 }
 
 func (Order) JavaClassName() string {
-	return "com.ikurento.order.Order"
+	return "org.apache.dubbo.Order"
 }
 
 type OrderProvider struct{}
@@ -62,10 +56,7 @@ func (o *OrderProvider) GetOrder(ctx context.Context, req []interface{}) (*Order
 	}
 	println("response from product result: %v\n", product)
 
-	rsp := Order{
-		"A001", "A001", 200, 2, *product}
-
-	println("rsp:%#v", rsp)
+	rsp := Order{"A001", "A001", 200, 2, *product}
 	return &rsp, nil
 }
 
