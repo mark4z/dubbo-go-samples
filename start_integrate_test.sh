@@ -28,6 +28,7 @@ array+=("direct/go-server")
 # filter
 array+=("filter/custom_filter/go-server")
 array+=("filter/tpslimit/go-server")
+array+=("filter/sentinel/go-server")
 
 # general
 array+=("general/dubbo/go-server")
@@ -50,6 +51,11 @@ array+=("metric/go-server")
 # router
 array+=("router/condition/go-server")
 #array+=("router/tag/go-server")
+
+# registry/servicediscovery/zookeeper
+array+=("registry/servicediscovery/zookeeper/go-server")
+# registry/servicediscovery/consul
+#array+=("registry/servicediscovery/consul/go-server")
 
 
 for((i=0;i<${#array[*]};i++))
